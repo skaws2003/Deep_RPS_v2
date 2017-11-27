@@ -14,8 +14,8 @@ Graph Building
 
 
 # Placeholders
-X = tf.placeholder(tf.float32,[None,480,640])
-X_re = tf.reshape(X,[-1,480,640,])
+X = tf.placeholder(tf.float32,[None,480,640,3])
+X_re = tf.image.rgb_to_grayscale(X)
 Y = tf.placeholder(tf.float32,[None,3])
 
 # Initial Pooling layer
@@ -25,10 +25,11 @@ pool1 = tf.nn.max_pool(X_re,[1,4,4,1],[1,4,4,1],padding='SAME')
 WC1 = tf.Variable(tf.truncated_normal(shape = [3,3,1,2],stddev=0.1), name='WC1')
 BC1 = tf.Variable(tf.constant(0.1,shape = [2]),name='BC1')
 conv1 = tf.nn.relu(tf.nn.conv2d(pool1, WC1, strides=[1,2,2,1], padding='SAME') + BC1)
+conv1_drop = tf.nn.dropout(conv1,0.5)
 
 WC2 = tf.Variable(tf.truncated_normal(shape = [5,5,2,4],stddev=0.1),name='WC2')
 BC2 = tf.Variable(tf.constant(0.1,shape = [4]),name='BC2')
-conv2 = tf.nn.relu(tf.nn.conv2d(conv1, WC2, strides=[1,2,2,1], padding='SAME') + BC2)
+conv2 = tf.nn.relu(tf.nn.conv2d(conv1_drop, WC2, strides=[1,2,2,1], padding='SAME') + BC2)
 
 # Fully connected layer
 flatten = tf.reshape(conv2,[-1,4800])
@@ -64,16 +65,16 @@ input_set = []
 validation_set = []
 
 for i in range(1,701):
-    input_set.append((cv2.imread("D:/RPSDATAv2/rock (%d).bmp"%i,0), [1,0,0]))
-    input_set.append((cv2.imread("D:/RPSDATAv2/paper (%d).bmp"%i,0), [0,1,0]))
-    input_set.append((cv2.imread("D:/RPSDATAv2/scissors (%d).bmp"%i,0), [0,0,1]))
+    input_set.append((cv2.imread("D:/RPSDATAv2/rock (%d).bmp"%i), [1,0,0]))
+    input_set.append((cv2.imread("D:/RPSDATAv2/paper (%d).bmp"%i), [0,1,0]))
+    input_set.append((cv2.imread("D:/RPSDATAv2/scissors (%d).bmp"%i), [0,0,1]))
     if i%100 == 0:
         print("Loaded training data : (%d/700)"%i)
 
 for i in range(701,801):
-    validation_set.append((cv2.imread("D:/RPSDATAv2/rock (%d).bmp"%i,0), [1,0,0]))
-    validation_set.append((cv2.imread("D:/RPSDATAv2/paper (%d).bmp"%i,0), [0,1,0]))
-    validation_set.append((cv2.imread("D:/RPSDATAv2/scissors (%d).bmp"%i,0), [0,0,1]))
+    validation_set.append((cv2.imread("D:/RPSDATAv2/rock (%d).bmp"%i), [1,0,0]))
+    validation_set.append((cv2.imread("D:/RPSDATAv2/paper (%d).bmp"%i), [0,1,0]))
+    validation_set.append((cv2.imread("D:/RPSDATAv2/scissors (%d).bmp"%i), [0,0,1]))
     if i%100 == 0:
         print("Loaded validation data : (%d/700)"%i)
 
