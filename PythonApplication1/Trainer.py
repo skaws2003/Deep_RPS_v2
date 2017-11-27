@@ -50,7 +50,7 @@ comp_pred = tf.equal(tf.arg_max(result,1), tf.arg_max(Y, 1))
 accuracy = tf.reduce_mean(tf.cast(comp_pred, dtype=tf.float32))
 
 # Training
-training_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+training_step = tf.train.AdamOptimizer(1e-3).minimize(cross_entropy)
 
 
 
@@ -117,8 +117,12 @@ with tf.Session() as sess:
             print("Step=%d, Accuracy=%f, Cost=%f"%(step,accu,cost))
             if step%100 == 0:
                 print("Saving model...")
-                saver.save(sess,'./save/model',global_step=step)
-                print("Saving done")
+                try:
+                    saver.save(sess,'./save/model',global_step=step)
+                except:
+                    print("Saving not successful")
+                else:
+                    print("Saving done")
                 if step%1000 == 0 and step > 1:
                     plt.figure()
                     plt.plot(accu_set)
