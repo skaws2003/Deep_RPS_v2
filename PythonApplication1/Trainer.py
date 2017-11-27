@@ -14,11 +14,12 @@ Graph Building
 
 
 # Placeholders
-X = tf.placeholder(tf.float32,[None,480,640,1])
+X = tf.placeholder(tf.float32,[None,480,640])
+X_re = tf.reshape(X,[-1,480,640,1])
 Y = tf.placeholder(tf.float32,[None,3])
 
 # Initial Pooling layer
-pool1 = tf.nn.max_pool(X,[1,4,4,1],[1,4,4,1],padding='SAME')
+pool1 = tf.nn.max_pool(X_re,[1,4,4,1],[1,4,4,1],padding='SAME')
 
 # Convolutional layer
 WC1 = tf.Variable(tf.truncated_normal(shape = [3,3,1,2],stddev=0.1), name='WC1')
@@ -63,16 +64,16 @@ input_set = []
 validation_set = []
 
 for i in range(1,701):
-    input_set.append((cv2.imread("D:/RPSDATAv2/rock (%d)"%d), [1,0,0]))
-    input_set.append((cv2.imread("D:/RPSDATAv2/paper (%d)"%d), [0,1,0]))
-    input_set.append((cv2.imread("D:/RPSDATAv2/scissors (%d)"%d), [0,0,1]))
+    input_set.append((cv2.imread("D:/RPSDATAv2/rock (%d).bmp"%i,0), [1,0,0]))
+    input_set.append((cv2.imread("D:/RPSDATAv2/paper (%d).bmp"%i,0), [0,1,0]))
+    input_set.append((cv2.imread("D:/RPSDATAv2/scissors (%d).bmp"%i,0), [0,0,1]))
     if i%100 == 0:
         print("Loaded training data : (%d/700)"%i)
 
 for i in range(701,801):
-    validation_set.append((cv2.imread("D:/RPSDATAv2/rock (%d)"%d), [1,0,0]))
-    validation_set.append((cv2.imread("D:/RPSDATAv2/paper (%d)"%d), [0,1,0]))
-    validation_set.append((cv2.imread("D:/RPSDATAv2/scissors (%d)"%d), [0,0,1]))
+    validation_set.append((cv2.imread("D:/RPSDATAv2/rock (%d).bmp"%i,0), [1,0,0]))
+    validation_set.append((cv2.imread("D:/RPSDATAv2/paper (%d).bmp"%i,0), [0,1,0]))
+    validation_set.append((cv2.imread("D:/RPSDATAv2/scissors (%d).bmp"%i,0), [0,0,1]))
     if i%100 == 0:
         print("Loaded validation data : (%d/700)"%i)
 
@@ -89,7 +90,7 @@ Training
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     saving_params = ['WC1','WC2','BC1','BC2','WF1','WF2','BF1','BF2']
-    saver = tf.train.Saver(var_list=saving_params)
+    saver = tf.train.Saver(tf.global_variables(),max_to_keep=10)
 
     cost_set = []
     accu_set = []
